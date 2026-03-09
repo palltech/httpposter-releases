@@ -1,0 +1,333 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:HttpPostGet.ViewModels"
+        xmlns:models="using:HttpPostGet.Models"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d" d:DesignWidth="1100" d:DesignHeight="720"
+        x:Class="HttpPostGet.Views.MainWindow"
+        x:DataType="vm:MainWindowViewModel"
+        Icon="/Assets/app.ico"
+        Title="httpPostGet [v2.0]"
+        Width="1100" Height="720"
+        MinWidth="800" MinHeight="500">
+
+    <Design.DataContext>
+        <vm:MainWindowViewModel/>
+    </Design.DataContext>
+
+    <DockPanel>
+
+        <!-- STATUS BAR -->
+        <Border DockPanel.Dock="Bottom"
+                Background="{DynamicResource StatusBarBackground}"
+                Padding="12,4">
+            <Grid ColumnDefinitions="*, Auto">
+                <TextBlock Text="› palltech · httpPostGet · version (2.0) · © 2026"
+                           FontSize="11"
+                           Foreground="{DynamicResource StatusBarForeground}"
+                           VerticalAlignment="Center"/>
+                <Button Grid.Column="1"
+                        Content="{Binding ThemeIcon}"
+                        Command="{Binding ToggleThemeCommand}"
+                        ToolTip.Tip="Toggle theme"
+                        Padding="8,2"
+                        FontSize="14"
+                        Background="Transparent"
+                        Foreground="{DynamicResource StatusBarForeground}"/>
+            </Grid>
+        </Border>
+
+        <Grid ColumnDefinitions="*, 300">
+
+        <!-- ═══════════════════════════════════════════════════ -->
+        <!-- LEFT PANEL                                          -->
+        <!-- ═══════════════════════════════════════════════════ -->
+        <Grid Grid.Column="0" RowDefinitions="Auto, Auto, *, 8, *" Margin="12,12,6,12">
+
+            <!-- URL BAR -->
+            <Grid Grid.Row="0" Margin="0,0,0,8" ColumnDefinitions="Auto, *, 100, Auto">
+
+                <TextBlock Grid.Column="0"
+                           Text="URL"
+                           FontWeight="SemiBold"
+                           FontSize="12"
+                           VerticalAlignment="Center"
+                           Margin="0,0,8,0"/>
+
+                <TextBox Grid.Column="1"
+                         Text="{Binding Request.Url}"
+                         Watermark="https://api.example.com/endpoint"
+                         Margin="0,0,4,0"/>
+
+                <ComboBox Grid.Column="2"
+                          ItemsSource="{Binding Request.Methods}"
+                          SelectedItem="{Binding Request.SelectedMethod}"
+                          Margin="0,0,4,0"
+                          HorizontalAlignment="Stretch"/>
+
+                <Button Grid.Column="3"
+                        Content="Send"
+                        Command="{Binding Request.SendCommand}"
+                        IsEnabled="{Binding !Request.IsSending}"
+                        VerticalAlignment="Stretch"
+                        Classes="accent"/>
+            </Grid>
+
+            <!-- HEADERS (accordion) -->
+            <Expander Grid.Row="1"
+                      IsExpanded="{Binding Request.HeadersExpanded}"
+                      Margin="0,0,0,8">
+                <Expander.Header>
+                    <StackPanel Orientation="Horizontal" Spacing="6">
+                        <TextBlock Text="HEADERS" FontWeight="SemiBold" FontSize="12"/>
+                        <TextBlock Text="{Binding Request.Headers.Count, StringFormat='({0})'}"
+                                   Foreground="Gray" FontSize="12"/>
+                    </StackPanel>
+                </Expander.Header>
+                <StackPanel Margin="0,4,0,0" Spacing="2">
+                    <ItemsControl ItemsSource="{Binding Request.Headers}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate x:DataType="vm:HeaderViewModel">
+                                <Grid ColumnDefinitions="*, *, 32" Margin="0,2">
+                                    <TextBox Grid.Column="0"
+                                             Text="{Binding Key}"
+                                             Watermark="Key"
+                                             Margin="0,0,4,0"/>
+                                    <TextBox Grid.Column="1"
+                                             Text="{Binding Value}"
+                                             Watermark="Value"
+                                             Margin="0,0,4,0"/>
+                                    <Button Grid.Column="2"
+                                            Content="✕"
+                                            Command="{Binding RemoveCommand}"
+                                            Padding="4"/>
+                                </Grid>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                    <Button Content="+ Add header"
+                            Command="{Binding Request.AddHeaderCommand}"
+                            HorizontalAlignment="Left"
+                            Margin="0,6,0,4"/>
+                </StackPanel>
+            </Expander>
+
+            <!-- BODY -->
+            <Grid Grid.Row="2" RowDefinitions="Auto, Auto, *" Margin="0,0,0,6">
+                <Grid Grid.Row="0" ColumnDefinitions="Auto, *, Auto" Margin="0,0,0,6">
+                    <TextBlock Grid.Column="0"
+                               Text="BODY"
+                               FontWeight="SemiBold"
+                               FontSize="12"
+                               VerticalAlignment="Center"
+                               Margin="0,0,12,0"/>
+                    <ComboBox Grid.Column="1"
+                              ItemsSource="{Binding Request.ContentTypes}"
+                              SelectedItem="{Binding Request.SelectedContentType}"
+                              HorizontalAlignment="Left"
+                              MinWidth="220"/>
+                    <Button Grid.Column="2"
+                            Content="+ Save as favorite"
+                            Command="{Binding SaveFavoriteCommand}"
+                            IsVisible="{Binding SidePanel.IsNormalActionsVisible}"
+                            HorizontalAlignment="Right"/>
+                </Grid>
+                <!-- Save favorite form -->
+                <StackPanel Grid.Row="1"
+                            IsVisible="{Binding SidePanel.IsSaveFavoriteVisible}"
+                            Margin="0,0,0,6"
+                            Spacing="4">
+                    <TextBox Text="{Binding SidePanel.NewFavoriteName}"
+                             Watermark="Request name..."/>
+                    <Grid ColumnDefinitions="*, *">
+                        <Button Grid.Column="0"
+                                Content="Save"
+                                Command="{Binding ConfirmSaveFavoriteCommand}"
+                                Classes="accent"
+                                HorizontalAlignment="Stretch"
+                                Margin="0,0,4,0"/>
+                        <Button Grid.Column="1"
+                                Content="Cancel"
+                                Command="{Binding SidePanel.CancelSaveFavoriteCommand}"
+                                HorizontalAlignment="Stretch"/>
+                    </Grid>
+                </StackPanel>
+                <TextBox Grid.Row="2"
+                         Text="{Binding Request.Body}"
+                         AcceptsReturn="True"
+                         TextWrapping="Wrap"
+                         FontFamily="Cascadia Code,Consolas,Courier New,monospace"
+                         FontSize="13"
+                         Foreground="{DynamicResource EditorForeground}"
+                         SelectionForegroundBrush="White"
+                         VerticalAlignment="Stretch"
+                         VerticalContentAlignment="Top"/>
+            </Grid>
+
+            <!-- SPLITTER -->
+            <GridSplitter Grid.Row="3"
+                          ResizeDirection="Rows"
+                          HorizontalAlignment="Stretch"
+                          Height="8"/>
+
+            <!-- RESPONSE -->
+            <Grid Grid.Row="4" RowDefinitions="Auto, Auto, *">
+                <StackPanel Grid.Row="0"
+                            Orientation="Horizontal"
+                            Spacing="12"
+                            Margin="0,8,0,6">
+                    <TextBlock Text="RESPONSE"
+                               FontWeight="SemiBold"
+                               FontSize="12"
+                               VerticalAlignment="Center"/>
+                    <TextBlock Text="{Binding Request.Response.StatusText}"
+                               VerticalAlignment="Center"
+                               FontSize="13"/>
+                </StackPanel>
+
+                <ProgressBar Grid.Row="1"
+                             IsVisible="{Binding Request.IsSending}"
+                             IsIndeterminate="True"
+                             Height="3"
+                             Margin="0,0,0,4"/>
+
+                <TextBox Grid.Row="2"
+                         Classes.sending="{Binding Request.IsSending}"
+                         Text="{Binding Request.Response.Body}"
+                         IsReadOnly="True"
+                         AcceptsReturn="True"
+                         TextWrapping="Wrap"
+                         FontFamily="Cascadia Code,Consolas,Courier New,monospace"
+                         FontSize="13"
+                         Foreground="{DynamicResource EditorForeground}"
+                         SelectionForegroundBrush="White"
+                         VerticalContentAlignment="Top"/>
+            </Grid>
+        </Grid>
+
+        <!-- ═══════════════════════════════════════════════════ -->
+        <!-- RIGHT PANEL                                         -->
+        <!-- ═══════════════════════════════════════════════════ -->
+        <Grid Grid.Column="1" RowDefinitions="7*, 8, 3*" Margin="6,12,12,12">
+
+            <!-- FAVORITES -->
+            <Grid Grid.Row="0" RowDefinitions="Auto, *, Auto">
+                <TextBlock Grid.Row="0"
+                           Text="FAVORITES"
+                           FontWeight="SemiBold"
+                           FontSize="12"
+                           Foreground="{DynamicResource SectionLabelForeground}"
+                           Margin="0,0,0,6"/>
+
+                <ListBox Grid.Row="1"
+                         ItemsSource="{Binding SidePanel.Favorites}"
+                         SelectedItem="{Binding SidePanel.SelectedFavorite}"
+                         Tag="{Binding SidePanel}">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate x:DataType="models:SavedRequest">
+                            <Border Background="Transparent"
+                                    Tag="{Binding $parent[ListBox].Tag}">
+                                <Border.ContextMenu>
+                                    <ContextMenu>
+                                        <MenuItem Header="Rename" Click="OnRenameFavoriteClick"/>
+                                        <MenuItem Header="Delete" Click="OnDeleteFavoriteClick"/>
+                                    </ContextMenu>
+                                </Border.ContextMenu>
+                                <TextBlock Text="{Binding Name}"
+                                           FontSize="12"
+                                           TextTrimming="CharacterEllipsis"
+                                           ToolTip.Tip="{Binding Url}"/>
+                            </Border>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+
+                <StackPanel Grid.Row="2" Margin="0,6,0,0" Spacing="4">
+                    <!-- Rename favorite form -->
+                    <StackPanel IsVisible="{Binding SidePanel.IsRenameFavoriteVisible}" Spacing="4">
+                        <TextBox Text="{Binding SidePanel.RenameFavoriteName}"
+                                 Watermark="New name..."/>
+                        <Grid ColumnDefinitions="*, *">
+                            <Button Grid.Column="0"
+                                    Content="Rename"
+                                    Command="{Binding SidePanel.ConfirmRenameFavoriteCommand}"
+                                    Classes="accent"
+                                    HorizontalAlignment="Stretch"
+                                    Margin="0,0,4,0"/>
+                            <Button Grid.Column="1"
+                                    Content="Cancel"
+                                    Command="{Binding SidePanel.CancelRenameFavoriteCommand}"
+                                    HorizontalAlignment="Stretch"/>
+                        </Grid>
+                    </StackPanel>
+                </StackPanel>
+            </Grid>
+
+            <!-- SPLITTER -->
+            <GridSplitter Grid.Row="1"
+                          ResizeDirection="Rows"
+                          HorizontalAlignment="Stretch"
+                          Height="8"/>
+
+            <!-- HISTORY -->
+            <Grid Grid.Row="2" RowDefinitions="Auto, *, Auto">
+                <TextBlock Grid.Row="0"
+                           Text="HISTORY"
+                           FontWeight="SemiBold"
+                           FontSize="12"
+                           Foreground="{DynamicResource SectionLabelForeground}"
+                           Margin="0,4,0,6"/>
+
+                <ListBox Grid.Row="1"
+                         ItemsSource="{Binding SidePanel.History}"
+                         SelectedItem="{Binding SidePanel.SelectedHistoryEntry}">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate x:DataType="models:HistoryEntry">
+                            <Border Background="Transparent">
+                                <Border.ContextMenu>
+                                    <ContextMenu>
+                                        <MenuItem Header="Save as favorite" Click="OnSaveHistoryAsFavoriteClick"/>
+                                        <Separator/>
+                                        <MenuItem Header="Delete" Click="OnDeleteHistoryEntryClick"/>
+                                        <MenuItem Header="Clear history" Click="OnClearHistoryClick"/>
+                                    </ContextMenu>
+                                </Border.ContextMenu>
+                                <StackPanel Spacing="1">
+                                    <TextBlock Text="{Binding DisplayText}"
+                                               FontSize="12"
+                                               TextTrimming="CharacterEllipsis"/>
+                                    <TextBlock Text="{Binding SentAt, StringFormat='{}{0:HH:mm:ss}'}"
+                                               FontSize="11"
+                                               Foreground="Gray"/>
+                                </StackPanel>
+                            </Border>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+
+                <!-- Save history entry as favorite form -->
+                <StackPanel Grid.Row="2"
+                            IsVisible="{Binding SidePanel.IsSaveHistoryAsFavoriteVisible}"
+                            Margin="0,6,0,0"
+                            Spacing="4">
+                    <TextBox Text="{Binding SidePanel.SaveHistoryAsFavoriteName}"
+                             Watermark="Favorite name..."/>
+                    <Grid ColumnDefinitions="*, *">
+                        <Button Grid.Column="0"
+                                Content="Save"
+                                Command="{Binding SidePanel.ConfirmSaveHistoryAsFavoriteCommand}"
+                                Classes="accent"
+                                HorizontalAlignment="Stretch"
+                                Margin="0,0,4,0"/>
+                        <Button Grid.Column="1"
+                                Content="Cancel"
+                                Command="{Binding SidePanel.CancelSaveHistoryAsFavoriteCommand}"
+                                HorizontalAlignment="Stretch"/>
+                    </Grid>
+                </StackPanel>
+            </Grid>
+        </Grid>
+        </Grid>
+    </DockPanel>
+</Window>

@@ -1,0 +1,269 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:HttpPoster.ViewModels"
+        xmlns:models="using:HttpPoster.Models"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d" d:DesignWidth="1100" d:DesignHeight="720"
+        x:Class="HttpPoster.Views.MainWindow"
+        x:DataType="vm:MainWindowViewModel"
+        Icon="/Assets/app.ico"
+        Title="httpPoster"
+        Width="1100" Height="720"
+        MinWidth="800" MinHeight="500">
+
+    <Design.DataContext>
+        <vm:MainWindowViewModel/>
+    </Design.DataContext>
+
+    <DockPanel>
+
+        <!-- STATUS BAR -->
+        <Border DockPanel.Dock="Bottom"
+                Background="#2D2D2D"
+                Padding="12,4">
+            <TextBlock Text="Palltech httpPoster v0.1  ©  2026"
+                       FontSize="11"
+                       Foreground="#AAAAAA"/>
+        </Border>
+
+        <Grid ColumnDefinitions="*, 300">
+
+        <!-- ═══════════════════════════════════════════════════ -->
+        <!-- LEVÝ PANEL                                          -->
+        <!-- ═══════════════════════════════════════════════════ -->
+        <Grid Grid.Column="0" RowDefinitions="Auto, Auto, *, 6, *" Margin="12,12,6,12">
+
+            <!-- URL BAR -->
+            <Grid Grid.Row="0" Margin="0,0,0,8">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="140"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="100"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <ComboBox Grid.Column="0"
+                          ItemsSource="{Binding AddressBook}"
+                          SelectedItem="{Binding SelectedAddressBookEntry}"
+                          PlaceholderText="Adresář URL"
+                          Margin="0,0,4,0"
+                          HorizontalAlignment="Stretch">
+                    <ComboBox.ItemTemplate>
+                        <DataTemplate x:DataType="models:AddressBookEntry">
+                            <TextBlock Text="{Binding DisplayName}"
+                                       ToolTip.Tip="{Binding Url}"
+                                       TextTrimming="CharacterEllipsis"/>
+                        </DataTemplate>
+                    </ComboBox.ItemTemplate>
+                </ComboBox>
+
+                <TextBox Grid.Column="1"
+                         Text="{Binding Request.Url}"
+                         Watermark="https://api.example.com/endpoint"
+                         Margin="0,0,4,0"/>
+
+                <ComboBox Grid.Column="2"
+                          ItemsSource="{Binding Request.Methods}"
+                          SelectedItem="{Binding Request.SelectedMethod}"
+                          Margin="0,0,4,0"
+                          HorizontalAlignment="Stretch"/>
+
+                <Button Grid.Column="3"
+                        Content="Odeslat"
+                        Command="{Binding Request.SendCommand}"
+                        IsEnabled="{Binding !Request.IsSending}"
+                        Classes="accent"/>
+            </Grid>
+
+            <!-- HLAVIČKY (accordion) -->
+            <Expander Grid.Row="1"
+                      IsExpanded="{Binding Request.HeadersExpanded}"
+                      Margin="0,0,0,8">
+                <Expander.Header>
+                    <StackPanel Orientation="Horizontal" Spacing="6">
+                        <TextBlock Text="HLAVIČKY" FontWeight="SemiBold" FontSize="12"/>
+                        <TextBlock Text="{Binding Request.Headers.Count, StringFormat='({0})'}"
+                                   Foreground="Gray" FontSize="12"/>
+                    </StackPanel>
+                </Expander.Header>
+                <StackPanel Margin="0,4,0,0" Spacing="2">
+                    <ItemsControl ItemsSource="{Binding Request.Headers}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate x:DataType="vm:HeaderViewModel">
+                                <Grid ColumnDefinitions="*, *, 32" Margin="0,2">
+                                    <TextBox Grid.Column="0"
+                                             Text="{Binding Key}"
+                                             Watermark="Key"
+                                             Margin="0,0,4,0"/>
+                                    <TextBox Grid.Column="1"
+                                             Text="{Binding Value}"
+                                             Watermark="Value"
+                                             Margin="0,0,4,0"/>
+                                    <Button Grid.Column="2"
+                                            Content="✕"
+                                            Command="{Binding RemoveCommand}"
+                                            Padding="4"/>
+                                </Grid>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                    <Button Content="+ Přidat hlavičku"
+                            Command="{Binding Request.AddHeaderCommand}"
+                            HorizontalAlignment="Left"
+                            Margin="0,6,0,4"/>
+                </StackPanel>
+            </Expander>
+
+            <!-- TĚLO -->
+            <Grid Grid.Row="2" RowDefinitions="Auto, *">
+                <Grid Grid.Row="0" ColumnDefinitions="Auto, *" Margin="0,0,0,6">
+                    <TextBlock Grid.Column="0"
+                               Text="TĚLO"
+                               FontWeight="SemiBold"
+                               FontSize="12"
+                               VerticalAlignment="Center"
+                               Margin="0,0,12,0"/>
+                    <ComboBox Grid.Column="1"
+                              ItemsSource="{Binding Request.ContentTypes}"
+                              SelectedItem="{Binding Request.SelectedContentType}"
+                              HorizontalAlignment="Left"
+                              MinWidth="220"/>
+                </Grid>
+                <TextBox Grid.Row="1"
+                         Text="{Binding Request.Body}"
+                         AcceptsReturn="True"
+                         TextWrapping="Wrap"
+                         FontFamily="Cascadia Code,Consolas,Courier New,monospace"
+                         FontSize="13"
+                         VerticalAlignment="Stretch"
+                         VerticalContentAlignment="Top"/>
+            </Grid>
+
+            <!-- SPLITTER -->
+            <GridSplitter Grid.Row="3"
+                          ResizeDirection="Rows"
+                          HorizontalAlignment="Stretch"
+                          Height="6"/>
+
+            <!-- ODPOVĚĎ -->
+            <Grid Grid.Row="4" RowDefinitions="Auto, *">
+                <StackPanel Grid.Row="0"
+                            Orientation="Horizontal"
+                            Spacing="12"
+                            Margin="0,4,0,6">
+                    <TextBlock Text="ODPOVĚĎ"
+                               FontWeight="SemiBold"
+                               FontSize="12"
+                               VerticalAlignment="Center"/>
+                    <TextBlock Text="{Binding Request.Response.StatusText}"
+                               VerticalAlignment="Center"
+                               FontSize="13"/>
+                </StackPanel>
+
+                <TextBox Grid.Row="1"
+                         Text="{Binding Request.Response.Body}"
+                         IsReadOnly="True"
+                         AcceptsReturn="True"
+                         TextWrapping="Wrap"
+                         FontFamily="Cascadia Code,Consolas,Courier New,monospace"
+                         FontSize="13"
+                         VerticalContentAlignment="Top"/>
+            </Grid>
+        </Grid>
+
+        <!-- ═══════════════════════════════════════════════════ -->
+        <!-- PRAVÝ PANEL                                         -->
+        <!-- ═══════════════════════════════════════════════════ -->
+        <Grid Grid.Column="1" RowDefinitions="*, 6, *" Margin="6,12,12,12">
+
+            <!-- OBLÍBENÉ -->
+            <Grid Grid.Row="0" RowDefinitions="Auto, *, Auto">
+                <TextBlock Grid.Row="0"
+                           Text="OBLÍBENÉ"
+                           FontWeight="SemiBold"
+                           FontSize="12"
+                           Margin="0,0,0,6"/>
+
+                <ListBox Grid.Row="1"
+                         ItemsSource="{Binding SidePanel.Favorites}"
+                         SelectedItem="{Binding SidePanel.SelectedFavorite}">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate x:DataType="models:SavedRequest">
+                            <TextBlock Text="{Binding Name}"
+                                       TextTrimming="CharacterEllipsis"
+                                       ToolTip.Tip="{Binding Url}"/>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+
+                <StackPanel Grid.Row="2" Margin="0,6,0,0" Spacing="4">
+                    <!-- Řádek: Uložit + Odebrat vybraný -->
+                    <Grid ColumnDefinitions="*, Auto" IsVisible="{Binding !SidePanel.IsSaveFavoriteVisible}">
+                        <Button Grid.Column="0"
+                                Content="+ Uložit request"
+                                Command="{Binding SaveFavoriteCommand}"
+                                HorizontalAlignment="Stretch"/>
+                        <Button Grid.Column="1"
+                                Content="✕"
+                                Command="{Binding SidePanel.RemoveSelectedFavoriteCommand}"
+                                IsEnabled="{Binding SidePanel.SelectedFavorite, Converter={x:Static ObjectConverters.IsNotNull}}"
+                                Margin="4,0,0,0"
+                                ToolTip.Tip="Odebrat vybraný"/>
+                    </Grid>
+
+                    <!-- Formulář uložení oblíbeného -->
+                    <StackPanel IsVisible="{Binding SidePanel.IsSaveFavoriteVisible}" Spacing="4">
+                        <TextBox Text="{Binding SidePanel.NewFavoriteName}"
+                                 Watermark="Název requestu..."/>
+                        <Grid ColumnDefinitions="*, *" >
+                            <Button Grid.Column="0"
+                                    Content="Uložit"
+                                    Command="{Binding ConfirmSaveFavoriteCommand}"
+                                    Classes="accent"
+                                    HorizontalAlignment="Stretch"
+                                    Margin="0,0,4,0"/>
+                            <Button Grid.Column="1"
+                                    Content="Zrušit"
+                                    Command="{Binding SidePanel.CancelSaveFavoriteCommand}"
+                                    HorizontalAlignment="Stretch"/>
+                        </Grid>
+                    </StackPanel>
+                </StackPanel>
+            </Grid>
+
+            <!-- SPLITTER -->
+            <GridSplitter Grid.Row="1"
+                          ResizeDirection="Rows"
+                          HorizontalAlignment="Stretch"
+                          Height="6"/>
+
+            <!-- HISTORIE -->
+            <Grid Grid.Row="2" RowDefinitions="Auto, *">
+                <TextBlock Grid.Row="0"
+                           Text="HISTORIE"
+                           FontWeight="SemiBold"
+                           FontSize="12"
+                           Margin="0,4,0,6"/>
+
+                <ListBox Grid.Row="1"
+                         ItemsSource="{Binding SidePanel.History}"
+                         SelectedItem="{Binding SidePanel.SelectedHistoryEntry}">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate x:DataType="models:HistoryEntry">
+                            <StackPanel Spacing="1">
+                                <TextBlock Text="{Binding DisplayText}"
+                                           FontSize="12"
+                                           TextTrimming="CharacterEllipsis"/>
+                                <TextBlock Text="{Binding SentAt, StringFormat='{}{0:HH:mm:ss}'}"
+                                           FontSize="11"
+                                           Foreground="Gray"/>
+                            </StackPanel>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+            </Grid>
+        </Grid>
+        </Grid>
+    </DockPanel>
+</Window>

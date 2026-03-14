@@ -142,7 +142,7 @@ public partial class SidePanelViewModel : ViewModelBase
     private void StartSaveHistoryAsFavorite(HistoryEntry entry)
     {
         _historyEntryToSave = entry;
-        SaveHistoryAsFavoriteName = $"Oblíbený {entry.SentAt:d.M.yyyy HH:mm}";
+        SaveHistoryAsFavoriteName = $"Favorite {entry.SentAt:yyyy-MM-dd HH:mm}";
         IsSaveHistoryAsFavoriteVisible = true;
     }
 

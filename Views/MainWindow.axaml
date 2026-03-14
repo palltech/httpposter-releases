@@ -23,14 +23,14 @@
                 Background="{DynamicResource StatusBarBackground}"
                 Padding="12,4">
             <Grid ColumnDefinitions="*, Auto">
-                <TextBlock Text="› palltech · httpPoster · verze (0.1) · © 2026"
+                <TextBlock Text="› palltech · httpPoster · version (0.1) · © 2026"
                            FontSize="11"
                            Foreground="{DynamicResource StatusBarForeground}"
                            VerticalAlignment="Center"/>
                 <Button Grid.Column="1"
                         Content="{Binding ThemeIcon}"
                         Command="{Binding ToggleThemeCommand}"
-                        ToolTip.Tip="Přepnout motiv"
+                        ToolTip.Tip="Toggle theme"
                         Padding="8,2"
                         FontSize="14"
                         Background="Transparent"
@@ -41,7 +41,7 @@
         <Grid ColumnDefinitions="*, 300">
 
         <!-- ═══════════════════════════════════════════════════ -->
-        <!-- LEVÝ PANEL                                          -->
+        <!-- LEFT PANEL                                          -->
         <!-- ═══════════════════════════════════════════════════ -->
         <Grid Grid.Column="0" RowDefinitions="Auto, Auto, *, 8, *" Margin="12,12,6,12">
 
@@ -67,20 +67,20 @@
                           HorizontalAlignment="Stretch"/>
 
                 <Button Grid.Column="3"
-                        Content="Odeslat"
+                        Content="Send"
                         Command="{Binding Request.SendCommand}"
                         IsEnabled="{Binding !Request.IsSending}"
                         VerticalAlignment="Stretch"
                         Classes="accent"/>
             </Grid>
 
-            <!-- HLAVIČKY (accordion) -->
+            <!-- HEADERS (accordion) -->
             <Expander Grid.Row="1"
                       IsExpanded="{Binding Request.HeadersExpanded}"
                       Margin="0,0,0,8">
                 <Expander.Header>
                     <StackPanel Orientation="Horizontal" Spacing="6">
-                        <TextBlock Text="HLAVIČKY" FontWeight="SemiBold" FontSize="12"/>
+                        <TextBlock Text="HEADERS" FontWeight="SemiBold" FontSize="12"/>
                         <TextBlock Text="{Binding Request.Headers.Count, StringFormat='({0})'}"
                                    Foreground="Gray" FontSize="12"/>
                     </StackPanel>
@@ -106,18 +106,18 @@
                             </DataTemplate>
                         </ItemsControl.ItemTemplate>
                     </ItemsControl>
-                    <Button Content="+ Přidat hlavičku"
+                    <Button Content="+ Add header"
                             Command="{Binding Request.AddHeaderCommand}"
                             HorizontalAlignment="Left"
                             Margin="0,6,0,4"/>
                 </StackPanel>
             </Expander>
 
-            <!-- TĚLO -->
+            <!-- BODY -->
             <Grid Grid.Row="2" RowDefinitions="Auto, Auto, *" Margin="0,0,0,6">
                 <Grid Grid.Row="0" ColumnDefinitions="Auto, *, Auto" Margin="0,0,0,6">
                     <TextBlock Grid.Column="0"
-                               Text="TĚLO"
+                               Text="BODY"
                                FontWeight="SemiBold"
                                FontSize="12"
                                VerticalAlignment="Center"
@@ -128,27 +128,27 @@
                               HorizontalAlignment="Left"
                               MinWidth="220"/>
                     <Button Grid.Column="2"
-                            Content="+ Uložit jako oblíbené"
+                            Content="+ Save as favorite"
                             Command="{Binding SaveFavoriteCommand}"
                             IsVisible="{Binding SidePanel.IsNormalActionsVisible}"
                             HorizontalAlignment="Right"/>
                 </Grid>
-                <!-- Formulář uložení oblíbeného -->
+                <!-- Save favorite form -->
                 <StackPanel Grid.Row="1"
                             IsVisible="{Binding SidePanel.IsSaveFavoriteVisible}"
                             Margin="0,0,0,6"
                             Spacing="4">
                     <TextBox Text="{Binding SidePanel.NewFavoriteName}"
-                             Watermark="Název requestu..."/>
+                             Watermark="Request name..."/>
                     <Grid ColumnDefinitions="*, *">
                         <Button Grid.Column="0"
-                                Content="Uložit"
+                                Content="Save"
                                 Command="{Binding ConfirmSaveFavoriteCommand}"
                                 Classes="accent"
                                 HorizontalAlignment="Stretch"
                                 Margin="0,0,4,0"/>
                         <Button Grid.Column="1"
-                                Content="Zrušit"
+                                Content="Cancel"
                                 Command="{Binding SidePanel.CancelSaveFavoriteCommand}"
                                 HorizontalAlignment="Stretch"/>
                     </Grid>
@@ -171,13 +171,13 @@
                           HorizontalAlignment="Stretch"
                           Height="8"/>
 
-            <!-- ODPOVĚĎ -->
+            <!-- RESPONSE -->
             <Grid Grid.Row="4" RowDefinitions="Auto, Auto, *">
                 <StackPanel Grid.Row="0"
                             Orientation="Horizontal"
                             Spacing="12"
                             Margin="0,8,0,6">
-                    <TextBlock Text="ODPOVĚĎ"
+                    <TextBlock Text="RESPONSE"
                                FontWeight="SemiBold"
                                FontSize="12"
                                VerticalAlignment="Center"/>
@@ -207,14 +207,14 @@
         </Grid>
 
         <!-- ═══════════════════════════════════════════════════ -->
-        <!-- PRAVÝ PANEL                                         -->
+        <!-- RIGHT PANEL                                         -->
         <!-- ═══════════════════════════════════════════════════ -->
         <Grid Grid.Column="1" RowDefinitions="7*, 8, 3*" Margin="6,12,12,12">
 
-            <!-- OBLÍBENÉ -->
+            <!-- FAVORITES -->
             <Grid Grid.Row="0" RowDefinitions="Auto, *, Auto">
                 <TextBlock Grid.Row="0"
-                           Text="OBLÍBENÉ"
+                           Text="FAVORITES"
                            FontWeight="SemiBold"
                            FontSize="12"
                            Foreground="{DynamicResource SectionLabelForeground}"
@@ -230,8 +230,8 @@
                                     Tag="{Binding $parent[ListBox].Tag}">
                                 <Border.ContextMenu>
                                     <ContextMenu>
-                                        <MenuItem Header="Přejmenovat" Click="OnRenameFavoriteClick"/>
-                                        <MenuItem Header="Smazat" Click="OnDeleteFavoriteClick"/>
+                                        <MenuItem Header="Rename" Click="OnRenameFavoriteClick"/>
+                                        <MenuItem Header="Delete" Click="OnDeleteFavoriteClick"/>
                                     </ContextMenu>
                                 </Border.ContextMenu>
                                 <TextBlock Text="{Binding Name}"
@@ -244,19 +244,19 @@
                 </ListBox>
 
                 <StackPanel Grid.Row="2" Margin="0,6,0,0" Spacing="4">
-                    <!-- Formulář přejmenování oblíbeného -->
+                    <!-- Rename favorite form -->
                     <StackPanel IsVisible="{Binding SidePanel.IsRenameFavoriteVisible}" Spacing="4">
                         <TextBox Text="{Binding SidePanel.RenameFavoriteName}"
-                                 Watermark="Nový název..."/>
+                                 Watermark="New name..."/>
                         <Grid ColumnDefinitions="*, *">
                             <Button Grid.Column="0"
-                                    Content="Přejmenovat"
+                                    Content="Rename"
                                     Command="{Binding SidePanel.ConfirmRenameFavoriteCommand}"
                                     Classes="accent"
                                     HorizontalAlignment="Stretch"
                                     Margin="0,0,4,0"/>
                             <Button Grid.Column="1"
-                                    Content="Zrušit"
+                                    Content="Cancel"
                                     Command="{Binding SidePanel.CancelRenameFavoriteCommand}"
                                     HorizontalAlignment="Stretch"/>
                         </Grid>
@@ -270,10 +270,10 @@
                           HorizontalAlignment="Stretch"
                           Height="8"/>
 
-            <!-- HISTORIE -->
+            <!-- HISTORY -->
             <Grid Grid.Row="2" RowDefinitions="Auto, *, Auto">
                 <TextBlock Grid.Row="0"
-                           Text="HISTORIE"
+                           Text="HISTORY"
                            FontWeight="SemiBold"
                            FontSize="12"
                            Foreground="{DynamicResource SectionLabelForeground}"
@@ -287,10 +287,10 @@
                             <Border Background="Transparent">
                                 <Border.ContextMenu>
                                     <ContextMenu>
-                                        <MenuItem Header="Uložit jako oblíbené" Click="OnSaveHistoryAsFavoriteClick"/>
+                                        <MenuItem Header="Save as favorite" Click="OnSaveHistoryAsFavoriteClick"/>
                                         <Separator/>
-                                        <MenuItem Header="Smazat" Click="OnDeleteHistoryEntryClick"/>
-                                        <MenuItem Header="Vymazat historii" Click="OnClearHistoryClick"/>
+                                        <MenuItem Header="Delete" Click="OnDeleteHistoryEntryClick"/>
+                                        <MenuItem Header="Clear history" Click="OnClearHistoryClick"/>
                                     </ContextMenu>
                                 </Border.ContextMenu>
                                 <StackPanel Spacing="1">
@@ -306,22 +306,22 @@
                     </ListBox.ItemTemplate>
                 </ListBox>
 
-                <!-- Formulář uložení záznamu z historie jako oblíbeného -->
+                <!-- Save history entry as favorite form -->
                 <StackPanel Grid.Row="2"
                             IsVisible="{Binding SidePanel.IsSaveHistoryAsFavoriteVisible}"
                             Margin="0,6,0,0"
                             Spacing="4">
                     <TextBox Text="{Binding SidePanel.SaveHistoryAsFavoriteName}"
-                             Watermark="Název oblíbeného..."/>
+                             Watermark="Favorite name..."/>
                     <Grid ColumnDefinitions="*, *">
                         <Button Grid.Column="0"
-                                Content="Uložit"
+                                Content="Save"
                                 Command="{Binding SidePanel.ConfirmSaveHistoryAsFavoriteCommand}"
                                 Classes="accent"
                                 HorizontalAlignment="Stretch"
                                 Margin="0,0,4,0"/>
                         <Button Grid.Column="1"
-                                Content="Zrušit"
+                                Content="Cancel"
                                 Command="{Binding SidePanel.CancelSaveHistoryAsFavoriteCommand}"
                                 HorizontalAlignment="Stretch"/>
                     </Grid>

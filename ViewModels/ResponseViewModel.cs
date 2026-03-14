@@ -19,7 +19,7 @@ public partial class ResponseViewModel : ViewModelBase
         if (result.ErrorMessage is not null)
         {
             IsError = true;
-            StatusText = "Chyba";
+            StatusText = "Error";
             Body = result.ErrorMessage;
             HeadersText = string.Empty;
         }

@@ -15,12 +15,12 @@ A lightweight desktop tool for testing HTTP requests. A simple, portable alterna
 
 ## Download
 
-### v1.0
+### v2.0
 
 | Variant | Requirements |
 |---|---|
-| [httpPostGet-v1.0-standalone.zip](../../releases/download/v1.0/httpPostGet-v1.0-standalone.zip) | None — runs on any Windows 10/11 x64 |
-| [httpPostGet-v1.0-dependent.zip](../../releases/download/v1.0/httpPostGet-v1.0-dependent.zip) | [.NET 9 Runtime](https://dotnet.microsoft.com/en-us/download/dotnet/9.0/runtime) |
+| [httpPostGet-v2.0-standalone.zip](../../releases/download/v2.0/httpPostGet-v2.0-standalone.zip) | None — runs on any Windows 10/11 x64 |
+| [httpPostGet-v2.0-dependent.zip](../../releases/download/v2.0/httpPostGet-v2.0-dependent.zip) | [.NET 9 Runtime](https://dotnet.microsoft.com/en-us/download/dotnet/9.0/runtime) |
 
 > Not sure which to pick? Download the standalone version — it works out of the box.
 
@@ -57,4 +57,4 @@ data/
 
 ---
 
-Palltech httpPostGet v1.0  ©  2026
+Palltech httpPostGet v2.0  ©  2026
